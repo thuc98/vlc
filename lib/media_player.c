@@ -744,7 +744,7 @@ libvlc_media_player_new( libvlc_instance_t *instance )
     var_Create (mp, "mute", VLC_VAR_BOOL);
     var_Create (mp, "volume", VLC_VAR_FLOAT);
     var_Create (mp, "corks", VLC_VAR_INTEGER);
-    var_Create (mp, "audio-filter", VLC_VAR_STRING);
+    var_Create (mp, "audio-filter", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
     var_Create (mp, "role", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
     var_Create (mp, "amem-data", VLC_VAR_ADDRESS);
     var_Create (mp, "amem-setup", VLC_VAR_ADDRESS);
@@ -2097,8 +2097,9 @@ int libvlc_media_player_set_equalizer( libvlc_media_player_t *p_mi, libvlc_equal
         var_SetFloat( p_mi, "equalizer-preamp", p_equalizer->f_preamp );
         var_SetString( p_mi, "equalizer-bands", bands );
     }
-    var_SetString( p_mi, "audio-filter", p_equalizer ? "equalizer" : "" );
-
+   // var_SetString( p_mi, "audio-filter", p_equalizer ? "equalizer" : "" );
+   aout_EnableFilter((audio_output_t *)p_mi, "equalizer", p_equalizer);
+  
     audio_output_t *p_aout = vlc_player_aout_Hold( p_mi->player );
     if( p_aout != NULL )
     {
@@ -2108,7 +2109,8 @@ int libvlc_media_player_set_equalizer( libvlc_media_player_t *p_mi, libvlc_equal
             var_SetString( p_aout, "equalizer-bands", bands );
         }
 
-        var_SetString( p_aout, "audio-filter", p_equalizer ? "equalizer" : "" );
+        // var_SetString( p_aout, "audio-filter", p_equalizer ? "equalizer" : "" );
+        aout_EnableFilter(p_aout, "equalizer", p_equalizer);
         aout_Release(p_aout);
     }
 
